@@ -1,20 +1,12 @@
-require("dotenv").config();
-var mysql = require("mysql");
-var connection = mysql.createConnection({
-   host: process.env.RDS_HOST,
-   user: process.env.RDS_USER,
-   password: process.env.RDS_PASSWORD,
-   database: "white_bear_app",
-});
+const express = require("express");
+const app = express();
 
-connection.connect();
+app.use("/api/v1/users", require("./api/v1/users"));
+app.use("/api/v1/memory-cards", require("./api/v1/memory-cards"));
+// use above URL to access javascript file
+app.get("/", (req, res) => res.send("Hello World!"));
 
-connection.query("SELECT 1 + 1 AS solution", (error, results, fields) => {
-   if (error) {
-      console.log(error);
-   } else {
-      console.log("The solution is: ", results[0].solution);
-   }
-});
-
-connection.end();
+const port = process.env.PORT || 3045;
+app.listen(port, () =>
+   console.log(`Serving running at http://localhost:${port}`)
+);

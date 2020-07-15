@@ -1,0 +1,52 @@
+const memoryCards = [
+   {
+      id: "2fa6cbf2-a17a-4af1-abdf-05ea43ee2015",
+      imagery:
+         "The quick, brown fox jumps over a lazy dog. DJs flock by when MTV ax quiz prog. Junk MTV quiz graced by fox whelps. Bawds jog, flick quartz, vex nymphs. Waltz, bad nymph, for quick jigs vex!",
+      answer: "Answer1",
+      userid: "50f3f48e-8412-4a27-bf89-83b9ef06ab0c",
+      createdAt: 1592509362055,
+      nextAttemptAt: 1592509362049,
+      lastAttemptAt: 1592509362049,
+      totalSuccessfulAttempts: 0,
+      level: 1,
+   },
+   {
+      id: "055f3807-071c-4b0b-9e5e-ce8fcfbd74b0",
+      imagery:
+         "Fox nymphs grab quick-jived waltz. Brick quiz whangs jumpy veldt fox. Bright vixens jump; dozy fowl quack. Quick wafting zephyrs vex bold Jim.",
+      answer: "Answer2",
+      userid: "50f3f48e-8412-4a27-bf89-83b9ef06ab0c",
+      createdAt: 1592509362020,
+      nextAttemptAt: 1592509362049,
+      lastAttemptAt: 1592509362049,
+      totalSuccessfulAttempts: 1,
+      level: 1,
+   },
+   {
+      id: "8fcebc5c-a6b4-450a-93ec-2c31538023f8",
+      imagery:
+         "Quick zephyrs blow, vexing daft Jim. Sex-charged fop blew my junk TV quiz. How quickly daft jumping zebras vex. Two driven jocks help fax my big quiz.",
+      answer: "Answer3",
+      userid: "dbffe071-b5f6-4e70-8df7-2583fd274009",
+      createdAt: 1592509362047,
+      nextAttemptAt: 1592509362049,
+      lastAttemptAt: 1592509362049,
+      totalSuccessfulAttempts: 2,
+      level: 1,
+   },
+   {
+      id: "f75743ef-c82e-4f8a-9eb4-cf31c0a008f7",
+      imagery:
+         "Cozy sphinx waves quart jug of bad milk. A very bad quack might jinx zippy fowls. Few quips galvanized the mock jury box. Quick brown dogs jump over the lazy fox. ",
+      answer: "Answer4",
+      userid: "dbffe071-b5f6-4e70-8df7-2583fd274009",
+      createdAt: 1592509362049,
+      nextAttemptAt: 1592509362049,
+      lastAttemptAt: 1592509362049,
+      totalSuccessfulAttempts: 3,
+      level: 1,
+   },
+];
+
+export default memoryCards;

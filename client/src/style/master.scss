@@ -1,0 +1,14 @@
+//Required (From getbootstrap.com)
+//Import first
+@import "bootstrap/functions";
+@import "bootstrap/variables";
+@import "bootstrap/mixins";
+
+//Personal theming of bootstrap
+@import "theme.scss";
+
+//Bootstrap
+@import "bootstrap/bootstrap.scss";
+
+//Style overwriting Bootstrap
+@import "style.scss";
