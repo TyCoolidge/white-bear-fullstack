@@ -1,31 +1,35 @@
 import React from "react";
 import AppTemplate from "../ui/AppTemplate";
 import MemoryCard from "../ui/MemoryCard";
-import orderBy from "lodash/orderBy";
 import axios from "axios";
+const userId = "50f3f48e-8412-4a27-bf89-83b9ef06ab0c";
 
 export default class AllCards extends React.Component {
    constructor(props) {
       super(props);
 
       this.state = {
-         allCards: [],
-         displayedCards: [],
-         orderBy: '["createdAt", "desc"]', //default value
+         memoryCards: [],
+         order: "%60memory_cards%60.%60created_at%60%20DESC",
+         searchTerm: "",
       };
    }
 
    componentDidMount() {
+      this.setMemoryCards();
+   }
+
+   setMemoryCards() {
       //lifecycle method, do not have to call
       axios //api call
-         .get("https://run.mocky.io/v3/461e65d9-b5c3-4eeb-a299-3f63bcb3accb")
+         .get(
+            `/api/v1/memory-cards?userId=${userId}&searchTerm=${this.state.searchTerm}&order=${this.state.order}`
+         )
          .then((res) => {
             // handle success
             console.log(res.data);
-            const memoryCards = res.data;
             this.setState({
-               allCards: orderBy(memoryCards, ["createdAt"], ["desc"]),
-               displayedCards: orderBy(memoryCards, ["createdAt"], ["desc"]),
+               memoryCards: res.data,
             });
          })
          .catch((error) => {
@@ -34,24 +38,17 @@ export default class AllCards extends React.Component {
          });
    }
 
-   filteringCardsWithSearch() {
-      const searchInput = document
-         .getElementById("search-input")
-         .value.toLowerCase();
-      const allCards = [...this.state.allCards];
-      const fillteredCards = allCards.filter((card) => {
-         const cardBody = card.imagery + card.answer; //filter will search for words in both top and bottom of card
-         return cardBody.toLowerCase().indexOf(searchInput) >= 0;
+   setSearchTerm() {
+      const searchInput = document.getElementById("search-input");
+      this.setState({ searchTerm: searchInput }, () => {
+         this.setMemoryCards();
       });
-      const orderArr = JSON.parse(this.state.orderBy);
-      const orderedCards = orderBy(fillteredCards, ...orderArr);
-      this.setState({ displayedCards: orderedCards });
    }
+
    setCardOrder(e) {
       //"e" is synthetic event
-      this.setState({ orderBy: e.target.value }, () => {
-         // changes state of object by giving it current value of selected target in dropdown menu
-         return this.filteringCardsWithSearch(); // return the filteredCards that follow the order parameters
+      this.setState({ order: e.target.value }, () => {
+         return this.setMemoryCards(); // return the memoryCards that follow the order parameters
       });
       console.log(e.target.value);
    }
@@ -67,14 +64,14 @@ export default class AllCards extends React.Component {
                   placeholder="Search for a word"
                   id="search-input"
                   // onChange={() => {
-                  //    this.filteringCardsWithSearch();
+                  //    this.setMemoryCards();
                   // }}
                />
                <button
                   type="submit"
                   className="btn btn-primary btn-sm col-3 offset-1"
                   onClick={() => {
-                     this.filteringCardsWithSearch();
+                     this.setSearchTerm();
                   }}
                >
                   Search
@@ -93,20 +90,24 @@ export default class AllCards extends React.Component {
                      className="thick-border form-control"
                      onChange={(e) => this.setCardOrder(e)}
                   >
-                     <option value='["createdAt", "desc"]'>Most recent</option>
-                     <option value='[["totalSuccessfulAttempts", "createdAt"], ["desc", "desc"]]'>
+                     <option value="%60memory_cards%60.%60created_at%60%20DESC">
+                        Most recent
+                     </option>
+                     <option value="memory_cards.total_successful_attempts%20DESC,%20memory_cards.created_at%20DESC">
                         Easiest
                      </option>
-                     <option value='[["totalSuccessfulAttempts", "createdAt"], ["asc", "asc"]]'>
+                     <option value="memory_cards.total_successful_attempts%20ASC,%20memory_cards.created_at%20ASC">
                         Hardest
                      </option>
-                     <option value='["createdAt", "asc"]'>Oldest</option>
+                     <option value="%60memory_cards%60.%60created_at%60%20ASC">
+                        Oldest
+                     </option>
                   </select>
                </div>
             </div>
             <div className="clearfix"></div>
 
-            {this.state.displayedCards.map((memoryCard) => {
+            {this.state.memoryCards.map((memoryCard) => {
                return <MemoryCard card={memoryCard} key={memoryCard.id} />;
             })}
             {/* key = allows react to iterate over data quickly */}
