@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { Link } from "react-router-dom";
-import hash from "object-hash";
 import { v4 as getUuid } from "uuid";
 import { withRouter } from "react-router-dom";
 import { EMAIL_REGEX } from "../../utils/helpers";
@@ -97,31 +96,27 @@ class SignUp extends React.Component {
          this.state.hasEmailError === false &&
          this.state.hasPasswordError === false
       ) {
+         // Create user obj
          const signUpNewUser = {
             id: getUuid(),
             email: emailInput,
-            password: hash(passwordInput),
+            password: passwordInput,
             createdAt: Date.now(),
          };
          console.log("Created user object:", signUpNewUser);
+         // and post to API
+         // Update currentUser in global state with API response
+         // Go to next page: this.props.history.push("/create-answer");
+
          // Mimic API response
-         axios //api call
-            .get("https://run.mocky.io/v3/72bc0359-8717-447b-a4ab-16ec882ec2f6")
+         axios
+            .post("/api/v1/users", signUpNewUser)
             .then((res) => {
-               // handle success
-               const currentUser = res.data;
-               console.log(currentUser);
-               this.props.dispatch({
-                  type: actions.UPDATE_CURRENT_USER,
-                  payload: res.data,
-               });
+               console.log(res);
             })
-            .catch((error) => {
-               // handle error
-               console.log(error);
+            .catch((err) => {
+               console.log(err);
             });
-         console.log(signUpNewUser);
-         this.props.history.push("/create-answer");
       }
    }
 
@@ -165,12 +160,21 @@ class SignUp extends React.Component {
                               {this.state.emailError}
                            </p>
                         )}
-                        <h4 className="text-muted mt-2">Create a password</h4>
+                        <label className="text-muted mt-3">
+                           Create a password
+                           <br />
+                           <span
+                              style={{ fontSize: "14px" }}
+                              className="text-muted"
+                           >
+                              Must be at least 9 characters
+                           </span>
+                        </label>
                         <input
                            className={classnames({
                               "form-control": true,
                               "thick-border": true,
-                              "mb-1": true,
+                              "mb-2": true,
                               "is-invalid": this.state.hasPasswordError,
                            })}
                            type="password"

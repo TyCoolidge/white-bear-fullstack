@@ -1,7 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { withRouter, Link } from "react-router-dom";
-import hash from "object-hash";
 import { v4 as getUuid } from "uuid";
 import { EMAIL_REGEX } from "../../utils/helpers";
 import axios from "axios";
@@ -70,7 +69,7 @@ class LogIn extends React.Component {
          const logInUser = {
             id: getUuid(),
             email: logInEmailInput,
-            password: hash(logInPasswordInput),
+            password: logInPasswordInput,
             createdAt: Date.now(),
          };
          console.log("Created user object:", logInUser);
