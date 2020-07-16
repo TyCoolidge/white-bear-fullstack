@@ -47,10 +47,11 @@ export default class AllCards extends React.Component {
 
    setCardOrder(e) {
       //"e" is synthetic event
-      this.setState({ order: e.target.value }, () => {
-         return this.setMemoryCards(); // return the memoryCards that follow the order parameters
+      const newOrder = e.target.value;
+      console.log(newOrder);
+      this.setState({ order: newOrder }, () => {
+         this.setMemoryCards(); // return the memoryCards that follow the order parameters
       });
-      console.log(e.target.value);
    }
 
    render() {
@@ -63,9 +64,6 @@ export default class AllCards extends React.Component {
                   className="form-control col-8 thick-border"
                   placeholder="Search for a word"
                   id="search-input"
-                  // onChange={() => {
-                  //    this.setMemoryCards();
-                  // }}
                />
                <button
                   type="submit"
