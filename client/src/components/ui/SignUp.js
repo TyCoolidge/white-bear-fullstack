@@ -90,34 +90,47 @@ class SignUp extends React.Component {
       const emailInput = document.getElementById("email-input").value;
       const passwordInput = document.getElementById("create-password-input")
          .value;
-      await this.setEmailState(emailInput); //waits until the promise of setEmailState has settled and returns result
-      await this.setPasswordState(passwordInput, emailInput); //waits until the promise of setPasswordState has settled and returns result
-      if (
-         this.state.hasEmailError === false &&
-         this.state.hasPasswordError === false
-      ) {
-         // Create user obj
-         const signUpNewUser = {
-            id: getUuid(),
-            email: emailInput,
-            password: passwordInput,
-            createdAt: Date.now(),
-         };
-         console.log("Created user object:", signUpNewUser);
-         // and post to API
-         // Update currentUser in global state with API response
-         // Go to next page: this.props.history.push("/create-answer");
-
-         // Mimic API response
-         axios
-            .post("/api/v1/users", signUpNewUser)
-            .then((res) => {
-               console.log(res);
-            })
-            .catch((err) => {
-               console.log(err);
+      // Create user obj
+      const signUpNewUser = {
+         id: getUuid(),
+         email: emailInput,
+         password: passwordInput,
+         createdAt: Date.now(),
+      };
+      console.log("Created user object:", signUpNewUser);
+      // and post to API
+      axios
+         .post("/api/v1/users", signUpNewUser)
+         .then((res) => {
+            console.log(res.data);
+            // Update currentUser in global state with API response
+            this.props.dispatch({
+               type: actions.UPDATE_CURRENT_USER,
+               payload: res.data,
             });
-      }
+            this.props.history.push("/create-answer");
+         })
+         .catch((err) => {
+            const { data } = err.response;
+            console.log(data);
+            const { emailError, passwordError } = data;
+            if (emailError !== "") {
+               this.setState({ hasEmailError: true, emailError: emailError });
+            } else {
+               this.setState({ hasEmailError: false, emailError: emailError });
+            }
+            if (passwordError !== "") {
+               this.setState({
+                  hasPasswordError: true,
+                  passwordError: passwordError,
+               });
+            } else {
+               this.setState({
+                  hasPasswordError: false,
+                  passwordError: passwordError,
+               });
+            }
+         });
    }
 
    render() {
@@ -174,7 +187,6 @@ class SignUp extends React.Component {
                            className={classnames({
                               "form-control": true,
                               "thick-border": true,
-                              "mb-2": true,
                               "is-invalid": this.state.hasPasswordError,
                            })}
                            type="password"
@@ -183,7 +195,7 @@ class SignUp extends React.Component {
                         {this.state.hasPasswordError && (
                            <p
                               id="warningPassword"
-                              className="mb-3 text-danger"
+                              className="mt-1 mb-3 text-danger"
                               style={{
                                  fontSize: "14px",
                               }}
@@ -192,16 +204,6 @@ class SignUp extends React.Component {
                            </p>
                         )}
 
-                        <p
-                           id="warningNoCommon"
-                           className="invalid-feedback"
-                           style={{
-                              display: "none",
-                              fontSize: "13px",
-                           }}
-                        >
-                           Do not use a common password.
-                        </p>
                         <Link
                            to="#"
                            className="mt-5 btn btn-success btn-block"

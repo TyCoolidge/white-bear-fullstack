@@ -2,42 +2,60 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../../db");
-const selectUser = require("../../queries/selectUser");
-const { toJson, toSafeParse, toHash } = require("../../utils/helpers");
-const bcrypt = require("bcrypt");
-
-// @route       GET api/v1/users
-// @desc        Get a valid user based via email and password
-// @access      Public
-router.get("/", (req, res) => {
-   db.query(selectUser("dylan@gmail.com", "replace_me"))
-      .then((dbRes) => {
-         const user = toSafeParse(toJson(dbRes))[0];
-         // below is the broken down code of the const above
-         // const jsonRes = toJson(res);
-         // console.log(jsonRes);
-         // const parsedRes = toSafeParse(jsonRes);
-         // console.log(parsedRes);
-         // const firstObj = parsedRes[0];
-         // console.log(firstObj);
-         // const user = firstObj;
-         console.log(user);
-         res.json(user);
-      })
-      .catch((err) => {
-         console.log(err);
-         res.status(400).json(err);
-      });
-});
+const { toHash } = require("../../utils/helpers");
+const getSignUpEmailError = require("../../validation/getSignUpEmailError");
+const getSignUpPasswordError = require("../../validation/getSignUpPasswordError");
+const insertUser = require("../../queries/insertUser");
+const selectUserById = require("../../queries/selectUserById");
 
 // @route       POST api/v1/users
 // @desc        Create a new user
 // @access      Public
-router.post("/", (req, res) => {
-   const user = req.body;
-   const encryptedPassword = toHash(user.password);
-   user.password = encryptedPassword;
-   console.log(user);
+router.post("/", async (req, res) => {
+   const { id, email, password, createdAt } = req.body;
+   const emailError = await getSignUpEmailError(email);
+   const passwordError = getSignUpPasswordError(password, email);
+   if (emailError === "" && passwordError === "") {
+      const user = {
+         id: id,
+         password: await toHash(password),
+         created_at: createdAt,
+         email: email,
+      };
+
+      db.query(insertUser, user)
+         .then(() => {
+            db.query(selectUserById, id)
+               .then((users) => {
+                  const user = users[0];
+                  res.status(200).json({
+                     // grabs data from actual user base
+                     id: user.id,
+                     email: user.email,
+                     createdAt: user.created_at,
+                  });
+               })
+               .catch((err) => {
+                  console.log(err);
+                  res.status(400).json(
+                     "something bad happened in the database."
+                  );
+               });
+         })
+         .catch((err) => {
+            console.log(err);
+            // return a 400 error
+            res.status(400).json({
+               emailError: emailError,
+               passwordError: passwordError,
+            });
+         });
+   } else {
+      res.status(400).json({
+         emailError: emailError,
+         passwordError: passwordError,
+      });
+   }
 });
 
 module.exports = router;

@@ -15,13 +15,9 @@ module.exports = {
    },
 
    toHash(password) {
-      const saltRounds = 11;
-      bcrypt.hash(password, saltRounds, (err, hash) => {
-         if (err) {
-            console.log(err);
-         } else {
-            return hash;
-         }
-      });
+      const saltRounds = 12;
+      return bcrypt.hash(password, saltRounds);
    },
+
+   EMAIL_REGEX: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
 };
