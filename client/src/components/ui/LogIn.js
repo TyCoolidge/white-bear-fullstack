@@ -1,8 +1,6 @@
 import React from "react";
 import classnames from "classnames";
 import { withRouter, Link } from "react-router-dom";
-import { v4 as getUuid } from "uuid";
-import { EMAIL_REGEX } from "../../utils/helpers";
 import axios from "axios";
 import { actions } from "../../store/actions";
 import { connect } from "react-redux";
@@ -12,45 +10,11 @@ class LogIn extends React.Component {
       super(props);
 
       this.state = {
-         logInEmailError: "",
-         logInPasswordError: "",
-         hasLogInEmailError: false,
-         hasLogInPasswordError: false,
-         emailText: "",
-         passwordText: "",
+         emailError: "",
+         passwordError: "",
+         hasEmailError: false,
+         hasPasswordError: false,
       };
-   }
-
-   async setLogInEmailState(logInEmailInput) {
-      if (logInEmailInput === "")
-         this.setState({
-            logInEmailError: "Please enter your email address",
-            hasLogInEmailError: true, //will display if input is empty
-         });
-      else if (EMAIL_REGEX.test(logInEmailInput.toLowerCase()) === false) {
-         this.setState({
-            logInEmailError: "Please enter a valid email address",
-            hasLogInEmailError: true, //will display if email doesnt fit regex
-         });
-      } else {
-         this.setState({ logInEmailError: "", hasLogInEmailError: false });
-      }
-   }
-   async setLogInPasswordState(logInPasswordInput) {
-      //   console.log(passwordInput);
-      //   const uniqChars = [...new Set(passwordInput)];
-      //array of unique characters
-      if (logInPasswordInput === "") {
-         this.setState({
-            logInPasswordError: "Please enter your password",
-            hasLogInPasswordError: true, //will display if input is empty
-         });
-      } else {
-         this.setState({
-            logInPasswordError: "",
-            hasLogInPasswordError: false,
-         });
-      }
    }
 
    async validateAndLogInUser() {
@@ -60,38 +24,43 @@ class LogIn extends React.Component {
       const logInPasswordInput = document.getElementById(
          "welcome-back-password"
       ).value;
-      await this.setLogInEmailState(logInEmailInput); //waits until the promise of setEmailState has settled and returns result
-      await this.setLogInPasswordState(logInPasswordInput); //waits until the promise of setPasswordState has settled and returns result
-      if (
-         this.state.hasLogInEmailError === false &&
-         this.state.hasLogInPasswordError === false
-      ) {
-         const logInUser = {
-            id: getUuid(),
-            email: logInEmailInput,
-            password: logInPasswordInput,
-            createdAt: Date.now(),
-         };
-         console.log("Created user object:", logInUser);
-         // Mimic API response
-         axios //api call
-            .get("https://run.mocky.io/v3/72bc0359-8717-447b-a4ab-16ec882ec2f6")
-            .then((res) => {
-               // handle success
-               const currentUser = res.data;
-               console.log(currentUser);
-               this.props.dispatch({
-                  type: actions.UPDATE_CURRENT_USER,
-                  payload: res.data,
-               });
-            })
-            .catch((error) => {
-               // handle error
-               console.log(error);
+      const user = {
+         email: logInEmailInput,
+         password: logInPasswordInput,
+      };
+      axios //api call
+         .post("/api/v1/users/auth", user)
+         .then((res) => {
+            // handle success
+            console.log(res.data);
+            // Update currentUser in global state with API response
+            this.props.dispatch({
+               type: actions.UPDATE_CURRENT_USER,
+               payload: res.data,
             });
-
-         this.props.history.push("/create-answer");
-      }
+            this.props.history.push("/create-answer");
+         })
+         .catch((err) => {
+            const { data } = err.response;
+            console.log(data);
+            const { emailError, passwordError } = data;
+            if (emailError !== "") {
+               this.setState({ hasEmailError: true, emailError: emailError });
+            } else {
+               this.setState({ hasEmailError: false, emailError: emailError });
+            }
+            if (passwordError !== "") {
+               this.setState({
+                  hasPasswordError: true,
+                  passwordError: passwordError,
+               });
+            } else {
+               this.setState({
+                  hasPasswordError: false,
+                  passwordError: passwordError,
+               });
+            }
+         });
    }
 
    render() {
@@ -109,12 +78,12 @@ class LogIn extends React.Component {
                         className={classnames({
                            "form-control": true,
                            "thick-border": true,
-                           "is-invalid": this.state.hasLogInEmailError,
+                           "is-invalid": this.state.hasEmailError,
                         })}
                         type="text"
                         id="welcome-back-email"
                      />
-                     {this.state.hasLogInEmailError && (
+                     {this.state.hasEmailError && (
                         <p
                            id="warningWelcomeEmail"
                            className="mb-4 text-danger"
@@ -122,7 +91,7 @@ class LogIn extends React.Component {
                               fontSize: "14px",
                            }}
                         >
-                           {this.state.logInEmailError}
+                           {this.state.emailError}
                         </p>
                      )}
                      <h4 className="text-muted mt-2">Password</h4>
@@ -130,12 +99,12 @@ class LogIn extends React.Component {
                         className={classnames({
                            "form-control": true,
                            "thick-border": true,
-                           "is-invalid": this.state.hasLogInPasswordError,
+                           "is-invalid": this.state.hasPasswordError,
                         })}
                         type="password"
                         id="welcome-back-password"
                      />
-                     {this.state.hasLogInPasswordError && (
+                     {this.state.hasPasswordError && (
                         <p
                            id="warningWelcomePassword"
                            className="mb-4 text-danger"
@@ -143,7 +112,7 @@ class LogIn extends React.Component {
                               fontSize: "14px",
                            }}
                         >
-                           {this.state.logInPasswordError}
+                           {this.state.passwordError}
                         </p>
                      )}
 

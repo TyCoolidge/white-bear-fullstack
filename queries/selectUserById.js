@@ -4,7 +4,7 @@ const selectUserById = `
     FROM
         users
     WHERE
-        email = ?
+        id = ?
     LIMIT 1;
    `;
 module.exports = selectUserById;
