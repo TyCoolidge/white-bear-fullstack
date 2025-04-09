@@ -19,8 +19,8 @@ router.get("/", (req, res) => {
    /* https://www.npmjs.com/package/mysql#escaping-query-values */
    db.query(selectAllCards, [
       userId,
-      constructedSearchTerm,
-      constructedSearchTerm,
+      // constructedSearchTerm,
+      // constructedSearchTerm,
       { toSqlString: () => order },
    ])
       .then((memoryCards) => {

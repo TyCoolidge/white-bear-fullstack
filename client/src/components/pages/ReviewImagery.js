@@ -10,7 +10,9 @@ class ReviewImagery extends React.Component {
       super(props);
       if (props.queue.cards.length === 0) {
          axios
-            .get("https://run.mocky.io/v3/461e65d9-b5c3-4eeb-a299-3f63bcb3accb")
+            .get(
+               "/api/v1/memory-cards?userId=d42c4a2e-4501-4fd3-9117-665981824e23"
+            )
             .then((res) => {
                // handle success
                console.log(res);
